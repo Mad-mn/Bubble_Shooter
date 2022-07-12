@@ -14,6 +14,9 @@ public class CanvasController : MonoBehaviour
     [SerializeField] private float _takeCoinSpeed;
     [SerializeField] private CoinTxt _coinTxt;
     [SerializeField] private Text _levelTxt;
+    [SerializeField] private Animation _handAnimation;
+
+    private AudioSource _audio;
 
     private void Awake()
     {
@@ -28,6 +31,8 @@ public class CanvasController : MonoBehaviour
     {
         MainController.OnEndGame.AddListener(EndGame);
 
+        _audio = GetComponent<AudioSource>();
+
         ChangeLevelId();
     }
 
@@ -37,6 +42,14 @@ public class CanvasController : MonoBehaviour
         _gamePanel.SetActive(true);
         MainController._mainController.StartGame();
         _reloadCanvas.SetActive(true);
+    }
+
+    public void PlaySound()
+    {
+        if (!AudioController._audioController.IsOff)
+        {
+            _audio.Play();
+        }
     }
 
     public void ChangeStickmanCountTxt(int count)
@@ -55,6 +68,7 @@ public class CanvasController : MonoBehaviour
     public void EndGame()
     {
         _endTxt.SetActive(true);
+        _reloadCanvas.SetActive(false);
         StartCoroutine(TakeCoin());
     }
 
@@ -68,15 +82,26 @@ public class CanvasController : MonoBehaviour
             {
                 StickmanController._stickmanController.DectrementStickmanCount();
                 PlayerInfo._playerInfo.Coins++;
-                _coinTxt.ChangeTxt(PlayerInfo._playerInfo.Coins);
+                ChangeCointTxt();
 
                 _stickmanCountTxt.ChangeTxt(StickmanController._stickmanController.StickmanDestroyCount--);
 
                 yield return new WaitForSeconds(_takeCoinSpeed);
             }
         }
-
+        _endTxt.SetActive(false);
         _gamePanel.SetActive(false);
         _mainMenuPanel.SetActive(true);
+        if (_handAnimation.isPlaying)
+        {
+            _handAnimation.Stop();
+        }
+        _handAnimation.Play();
+        CannonController._cannonController.EnableOrDisableAniamtion();
+    }
+
+    public void ChangeCointTxt()
+    {
+        _coinTxt.ChangeTxt(PlayerInfo._playerInfo.Coins);
     }
 }

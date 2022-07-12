@@ -12,9 +12,10 @@ public class SaveData
 
     public int ReloadLvl;
     public int BulletLvl;
-    public int TimerLvl;
+    public int TimerCount;
 
     public int Coins;
 
+    public bool IsSoundOff;
     
 }

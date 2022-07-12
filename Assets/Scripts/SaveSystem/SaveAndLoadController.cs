@@ -9,7 +9,7 @@ public class SaveAndLoadController : MonoBehaviour
     private SaveData _myData;
     private PlayerInfo _playerInfo;
 
-    private void Start()
+    private void Awake()
     {
         _saveSystem = new BinarySaveSystem();
 
@@ -34,12 +34,12 @@ public class SaveAndLoadController : MonoBehaviour
 
     public void SetDefaultGameValues()
     {
-        _playerInfo.Coins = 0;
+        _playerInfo.Coins = 100;
         _playerInfo.BulletSpeed = 4;
         _playerInfo.ReloadSpeed = 0.01f;
-        _playerInfo.StopTimer = 1f;
+        
 
-        _playerInfo.StopTimerLvl = 1;
+        _playerInfo.StopTimerCount = 1;
         _playerInfo.ReloadSpeedLvl = 1;
         _playerInfo.BulletSpeedLvl = 1;
         LevelController._levelController.LevelId = 1;
@@ -54,11 +54,12 @@ public class SaveAndLoadController : MonoBehaviour
         _myData.BulletSpeed = _playerInfo.BulletSpeed;
         _myData.ReloadLvl = _playerInfo.ReloadSpeedLvl;
         _myData.ReloadSpeed = _playerInfo.ReloadSpeed;
-        _myData.StopTimer = _playerInfo.StopTimer;
-        _myData.TimerLvl = _playerInfo.StopTimerLvl;
+        
+        _myData.TimerCount = _playerInfo.StopTimerCount;
 
         _myData.LevelId = LevelController._levelController.LevelId;
 
+       
 
         _saveSystem.Save(_myData);
     }
@@ -75,7 +76,8 @@ public class SaveAndLoadController : MonoBehaviour
         _playerInfo.BulletSpeed = _myData.BulletSpeed;
         _playerInfo.ReloadSpeedLvl = _myData.ReloadLvl;
         _playerInfo.ReloadSpeed = _myData.ReloadSpeed;
-        _playerInfo.StopTimerLvl = _myData.TimerLvl;
-        _playerInfo.StopTimer = _myData.StopTimer;
+        _playerInfo.StopTimerCount = _myData.TimerCount;
+
+        
     }
 }

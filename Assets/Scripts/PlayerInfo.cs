@@ -11,11 +11,11 @@ public class PlayerInfo : MonoBehaviour
     public int Coins { get; set; }
     public float ReloadSpeed { get; set; }
     public float BulletSpeed { get; set; }
-    public float StopTimer { get; set; }
+    
 
     public int ReloadSpeedLvl { get; set; }
     public int BulletSpeedLvl { get; set; }
-    public int StopTimerLvl { get; set; }
+    public int StopTimerCount { get; set; }
 
     private void Awake()
     {
@@ -30,7 +30,7 @@ public class PlayerInfo : MonoBehaviour
         switch (type)
         {
             case Value.StopTimer:
-                StopTimerLvl++;
+                StopTimerCount++;
                 break;
             case Value.BulletSpeed:
                 BulletSpeedLvl++;
@@ -46,9 +46,6 @@ public class PlayerInfo : MonoBehaviour
     {
         switch (type)
         {
-            case Value.StopTimer:
-                StopTimer += _stopTimerLvlStep;
-                break;
             case Value.BulletSpeed:
                 BulletSpeed += _bulletSpeedLvlStep;
                 break;

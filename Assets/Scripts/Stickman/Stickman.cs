@@ -11,6 +11,7 @@ public class Stickman : MonoBehaviour
     [SerializeField] private float _yParticleOffset;
 
     private Animator _stickmanAnimator;
+    private Coroutine _moving;
 
     public StickmanColor Color { get; set; }
     public bool IsActive { get; set; }
@@ -26,7 +27,18 @@ public class Stickman : MonoBehaviour
         MainController.OnStartGame.AddListener(ChangeAnimation);
         MainController.OnStartGame.AddListener(MoveStickman);
         StickmanController._stickmanController.AllStickmanInLevel++;
+        StopTimerButton.OnGoStickman.AddListener(MoveStickman);
+        StopTimerButton.OnStopStickman.AddListener(StopStickman);
+        StopTimerButton.OnGoStickman.AddListener(ChangeAnimation);
+        StopTimerButton.OnStopStickman.AddListener(ChangeAnimation);
+
         
+        if (StopTimerButton.isStop)
+        {
+            StopStickman();
+            ChangeAnimation();
+        }
+
     }
     public void DestroyStickman()
     {
@@ -77,12 +89,23 @@ public class Stickman : MonoBehaviour
 
     public void OnDestroyStickman()
     {
+        
         StickmanController._stickmanController.IncrementStickmanCount();
+
     }
 
     public void MoveStickman()
     {
-        StartCoroutine(Moving());
+        
+         _moving = StartCoroutine(Moving());
+    }
+
+    public void StopStickman()
+    {
+        if (_moving != null)
+        {
+            StopCoroutine(_moving);
+        }
     }
 
     private IEnumerator Moving()

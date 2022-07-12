@@ -9,10 +9,12 @@ public class MainController : MonoBehaviour
 
     [SerializeField] private float _startBulletSpeed;
     [SerializeField] private float _startStickmanSpeed;
+    [SerializeField] private float _stopTimerTime;
 
     public float BulletSpeed { get; set; }
     public bool IsGamePlayed { get; set; }
     public float StickmanSpeed { get; set; }
+    public float StopTimerTime { get; private set; }
 
     public static UnityEvent OnStartGame = new UnityEvent();
     public static UnityEvent OnEndGame = new UnityEvent();
@@ -30,6 +32,7 @@ public class MainController : MonoBehaviour
         BulletSpeed = _startBulletSpeed;
        
         StickmanSpeed = _startStickmanSpeed;
+        StopTimerTime = _stopTimerTime;
     }
 
     public void StartGame()
@@ -41,7 +44,7 @@ public class MainController : MonoBehaviour
 
     public void EndGame()
     {
-        Debug.Log(0);
+       
         IsGamePlayed = false;
         OnEndGame.Invoke();
     }

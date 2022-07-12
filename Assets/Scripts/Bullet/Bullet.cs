@@ -10,6 +10,7 @@ public class Bullet : MonoBehaviour
     private Coroutine _moving;
     private Vector3 _direction;
     private Renderer _renderer;
+    private AudioSource _audio;
 
     public Stickman.StickmanColor Color { get; set; }
 
@@ -22,6 +23,7 @@ public class Bullet : MonoBehaviour
     private void Start()
     {
         MainController.OnEndGame.AddListener(DestroyBullet);
+        _audio = GetComponent<AudioSource>();
     }
 
     public void MoveTo(Vector3 direction)
@@ -76,6 +78,10 @@ public class Bullet : MonoBehaviour
             _direction = (other.transform.right * colliderSide) + (other.transform.right * colliderSide + _direction);
 
             _moving = StartCoroutine(Moving());
+            if (!AudioController._audioController.IsOff)
+            {
+                _audio.Play();
+            }
         }
         
     }

@@ -20,6 +20,7 @@ public class CannonController : MonoBehaviour
     private LineRenderer _lineRenderer;
     private Ray _ray;
     private Animation _animation;
+    private AudioSource _audio;
 
     public Material _nextBulletMaterial { get; set; }
     public Stickman.StickmanColor _nextBulletColorType { get; set; }
@@ -40,7 +41,9 @@ public class CannonController : MonoBehaviour
         _lineRenderer.SetPosition(0, _cannonTransform.position);
         _animation = GetComponent<Animation>();
         MainController.OnStartGame.AddListener(EnableOrDisableAniamtion);
-        MainController.OnEndGame.AddListener(EnableOrDisableAniamtion);
+        //MainController.OnEndGame.AddListener(EnableOrDisableAniamtion);
+
+        _audio = GetComponent<AudioSource>();
         Invoke("SetNextBulletColor", 0.01f);
 
        
@@ -50,6 +53,7 @@ public class CannonController : MonoBehaviour
     {
         if (!MainController._mainController.IsGamePlayed)
         {
+            Debug.Log(0);
             CastRayForSight();
         }
     }
@@ -90,6 +94,7 @@ public class CannonController : MonoBehaviour
     {
         if (_reloadCanvas.IsReady)
         {
+
             GameObject bullet = Instantiate(_bulletPrefab, _bulletSpawnPosition.position, Quaternion.identity);
 
             bullet.GetComponent<Bullet>().MoveTo(_cannonTransform.forward);
@@ -99,6 +104,10 @@ public class CannonController : MonoBehaviour
             SetNextBulletColor();
 
             _reloadCanvas.Reload();
+            if (!AudioController._audioController.IsOff)
+            {
+                _audio.Play();
+            }
         }
     }
 

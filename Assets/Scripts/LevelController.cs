@@ -41,6 +41,7 @@ public class LevelController : MonoBehaviour
     private void IncrementLevelId()
     {
         LevelId++;
+        CanvasController._canvasController.ChangeLevelId();
     }
 
     private void CheckLevelLineCount()
