@@ -14,7 +14,7 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 1
+  m_Fog: 0
   m_FogColor: {r: 0.2901961, g: 0.47450984, b: 0.76470596, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.04
@@ -1767,13 +1767,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: 0.3957255, y: 0.31813633, z: -0.14834939, w: 0.8486361}
+  m_LocalRotation: {x: 0.7324007, y: 0.21870969, z: -0.27456206, w: 0.58341324}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 390561896}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: 41.1, z: 0}
+  m_LocalEulerAnglesHint: {x: 102.92, y: 41.1, z: 0}
 --- !u!1 &753424071
 GameObject:
   m_ObjectHideFlags: 0
@@ -2651,15 +2651,15 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 923414922}
-  m_LocalRotation: {x: -0.3971479, y: 0, z: 0, w: 0.91775465}
-  m_LocalPosition: {x: 0, y: 0, z: 10.09}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 6.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1918106915}
   - {fileID: 1355181052}
   m_Father: {fileID: 0}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: -46.8, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 1.16}
@@ -2705,7 +2705,7 @@ Camera:
   m_BackGroundColor: {r: 0.29196337, g: 0.47559184, b: 0.764151, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
-  m_FOVAxisMode: 1
+  m_FOVAxisMode: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
   m_FocalLength: 50
@@ -2717,7 +2717,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 500
-  field of view: 72.51035
+  field of view: 36
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -2742,13 +2742,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0, y: 0.91775465, z: -0.3971479, w: 0}
-  m_LocalPosition: {x: -0.010350732, y: 17.24, z: 13.26}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
+  m_LocalPosition: {x: -0.010350732, y: 34.6, z: -0.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 390561896}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 46.8, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 180, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5363,7 +5363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _linePrefab: {fileID: 6085422905575804991, guid: 46db3ab50c5268541bb02589fc57a68a, type: 3}
-  _firstLineSpawnPosition: {x: 0, y: 0.53, z: -10}
+  _firstLineSpawnPosition: {x: 0, y: 0.53, z: -6}
   _createLineTimeStep: 0.2
   _linePositionOffset: 1.2
   _stickmanSpawnOffset: 1.05
