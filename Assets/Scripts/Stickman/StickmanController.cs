@@ -1,25 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class StickmanController : MonoBehaviour
 {
     public static StickmanController _stickmanController;
 
-    [SerializeField] private GameObject _linePrefab;
-    [SerializeField] private Vector3 _firstLineSpawnPosition;
-    [SerializeField] private float _createLineTimeStep;
-    [SerializeField] private float _linePositionOffset;
-    [SerializeField] private float _stickmanSpawnOffset;
+    public static UnityEvent OnMoveStickmans = new UnityEvent();
+    public static UnityEvent OnDestroyStickman = new UnityEvent();
+    public static UnityEvent OnKillstickman = new UnityEvent();
+
     [SerializeField] private GameObject _stickmanPrefab;
+    [SerializeField] private Material _red, _green, _yellow;
 
-    
-    private Vector3 _firstLinePosition;
 
-    public int StickmanDestroyCount { get; set; }
-    
-    public int AllStickmanInLevel { get; set; }
-    public float StickmanSpawnOffset { get; set; }
+    public int FirstLineCount { get; set; }
+   
+    public int MainLineCount { get; set; }
+
+    private int _allStickmanInLevel { get; set; }
+
 
     private void Awake()
     {
@@ -29,93 +30,90 @@ public class StickmanController : MonoBehaviour
         }
     }
 
-    private void Start()
+    public void MoveAllStickmans()
     {
-       
-        StickmanSpawnOffset = _stickmanSpawnOffset;
-        MainController.OnStartGame.AddListener(GetStickmanCount);
-        MainController.OnEndGame.AddListener(CreateNewLines);
-        StartCoroutine(CreateLines());
-        StickmanDestroyCount = 0;
-        _firstLinePosition = _firstLineSpawnPosition;
+        if (_allStickmanInLevel > 0)
+        {
+            Invoke("MoveAll", 0.2f);
+        }
     }
 
-    private void CreateNewLines()
+    private void MoveAll()
     {
-        
-        StartCoroutine(CreateLines());
+        OnMoveStickmans.Invoke();
     }
         
+    public void ResetStickmanLineInfo()
+    {
+        OnDestroyStickman.Invoke();
+    }
 
+    public void KillStickman()
+    {
+        Invoke("Kill", 0.02f);
+    }
+
+    private void Kill()
+    {
+        OnKillstickman.Invoke();
+    }
     public void IncrementStickmanCount()
     {
-        AllStickmanInLevel--;
-        StickmanDestroyCount++;
-        CanvasController._canvasController.ChangeStickmanCountTxt(StickmanDestroyCount);
-        if (AllStickmanInLevel == 0)
-        {
-            MainController._mainController.EndGame();
-        }
-
+        _allStickmanInLevel++;
     }
 
     public void DectrementStickmanCount()
     {
-        AllStickmanInLevel--;
-        if (AllStickmanInLevel == 0 && MainController._mainController.IsGamePlayed)
+        _allStickmanInLevel--;
+        if(_allStickmanInLevel == 0)
         {
-            
             MainController._mainController.EndGame();
         }
     }
 
-    private void GetStickmanCount()
+    public void CreateNewStickman(Vector3 bulletPosition, Stickman.StickmanColor colorType, List<Transform> _aroundTransforms)
     {
-        CanvasController._canvasController.ChangeStickmanCountTxt(StickmanDestroyCount);
-    }
+        float one = Vector3.Distance(bulletPosition, _aroundTransforms[1].position);
+        float two = Vector3.Distance(bulletPosition, _aroundTransforms[2].position);
+        float three = Vector3.Distance(bulletPosition, _aroundTransforms[3].position);
+        float four = Vector3.Distance(bulletPosition, _aroundTransforms[4].position);
+        float five = Vector3.Distance(bulletPosition, _aroundTransforms[0].position);
+        float six = Vector3.Distance(bulletPosition, _aroundTransforms[5].position);
 
-    private IEnumerator CreateLines()
-    {
-        yield return new WaitForEndOfFrame();
+        float min = Mathf.Min(one, two, three, four, five, six);
 
-        int lineCount = LevelController._levelController.GetStickmanLineCount();
-
-        for (int i = 0; i < lineCount; i++)
+        GameObject stickman = new GameObject();
+        foreach (Transform t in _aroundTransforms)
         {
-            GameObject line = Instantiate(_linePrefab, _firstLinePosition, Quaternion.identity);
 
-           
-            _firstLinePosition -= new Vector3(0f, 0f, _linePositionOffset);
-
-            yield return new WaitForSeconds(_createLineTimeStep);
-        }
-        _firstLinePosition = _firstLineSpawnPosition;
-    }
-
-    public void CreateNewStickman(Vector3 position, Vector3 direction, Material color, Stickman.StickmanColor colorType)
-    {
-        Ray ray = new Ray(position, direction);
-
-        if(Physics.Raycast(ray, out RaycastHit hit, 2)) /// Змінюємо спавн позицію якщо перед стікменом стоїть ішший стікмен
-        {
-            if (hit.transform.CompareTag("Player"))
+            if (Vector3.Distance(bulletPosition, t.position) == min)
             {
-                
-                position = hit.transform.localPosition;
-                CreateNewStickman(position, direction, color, colorType);
-                return;
+                stickman = Instantiate(_stickmanPrefab, t.position, Quaternion.identity);
+                break;
             }
         }
-        
-        Vector3 newStickmanPosition = new Vector3(position.x, position.y, position.z + _linePositionOffset);
-
-        GameObject stickman = Instantiate(_stickmanPrefab, newStickmanPosition, Quaternion.identity);
 
         Stickman s = stickman.GetComponent<Stickman>();
-        s.SetColor(color);
-        s.Color = colorType;
+        
+        //s.Color = colorType;
+        switch (colorType)
+        {
+            case Stickman.StickmanColor.Red:
+                s.SetMaterial(_red, colorType);
+                break;
+            case Stickman.StickmanColor.Green:
+                s.SetMaterial(_green, colorType);
+                break;
+            case Stickman.StickmanColor.Yellow:
+                s.SetMaterial(_yellow, colorType);
+                break;
+        }
         s.EnableParticle();
-        s.ChangeAnimation();
-        s.MoveStickman();
+        
+    }
+
+    private void CheckConnectionStickmans()
+    {
+
     }
 }

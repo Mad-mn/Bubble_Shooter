@@ -24,7 +24,7 @@ public class StickmanLine : MonoBehaviour
     {
         _stickmens = new List<Stickman>();
         
-        _stickmanSpawnOffsetVector = new Vector3(StickmanController._stickmanController.StickmanSpawnOffset, 0, 0);
+       // _stickmanSpawnOffsetVector = new Vector3(StickmanController._stickmanController.StickmanSpawnOffset, 0, 0);
 
         MainController.OnEndGame.AddListener(DestroyLine);
 
@@ -92,10 +92,10 @@ public class StickmanLine : MonoBehaviour
 
             _laststickmanMaterial = _stickmanMaterial;
 
-            stickman.GetComponent<Stickman>().SetColor(_stickmanMaterial);
-            if(_stickmanMaterial == _red) { stickman.GetComponent<Stickman>().Color = Stickman.StickmanColor.Red; }
-            if (_stickmanMaterial == _green) { stickman.GetComponent<Stickman>().Color = Stickman.StickmanColor.Green; }
-            if (_stickmanMaterial == _yellow) { stickman.GetComponent<Stickman>().Color = Stickman.StickmanColor.Yellow; }
+            //stickman.GetComponent<Stickman>().SetColor(_stickmanMaterial);
+            //if(_stickmanMaterial == _red) { stickman.GetComponent<Stickman>().Color = Stickman.StickmanColor.Red; }
+            //if (_stickmanMaterial == _green) { stickman.GetComponent<Stickman>().Color = Stickman.StickmanColor.Green; }
+            //if (_stickmanMaterial == _yellow) { stickman.GetComponent<Stickman>().Color = Stickman.StickmanColor.Yellow; }
 
             _stickmens.Add(stickman.GetComponent<Stickman>());
 

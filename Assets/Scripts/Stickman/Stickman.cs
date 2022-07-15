@@ -1,20 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Stickman : MonoBehaviour
 {
     private Renderer _renderer;
+    public static UnityEvent OnResetMainLine = new UnityEvent();
 
-    [SerializeField] private float _maxRayDistance;
+
     [SerializeField] private GameObject _particle;
     [SerializeField] private float _yParticleOffset;
+
+    [SerializeField] private StickmanColor _stickmanColorType;
+    [SerializeField] private Material _red, _green , _yellow;
+    [SerializeField] private bool _isMainLine;
+    [SerializeField] float _sphereRadius;
+    [SerializeField] private List<Transform> _aroundTransforms;
+    [SerializeField] private float _bulletDistanceToTransform;
 
     private Animator _stickmanAnimator;
     private Coroutine _moving;
 
-    public StickmanColor Color { get; set; }
+   
     public bool IsActive { get; set; }
+    public bool IsFirstLine { get; set; }
+    public bool IsMainLine { get; set; }
 
     private void Awake()
     {
@@ -24,86 +35,168 @@ public class Stickman : MonoBehaviour
     }
     private void Start()
     {
-        MainController.OnStartGame.AddListener(ChangeAnimation);
-        MainController.OnStartGame.AddListener(MoveStickman);
-        StickmanController._stickmanController.AllStickmanInLevel++;
-        StopTimerButton.OnGoStickman.AddListener(MoveStickman);
-        StopTimerButton.OnStopStickman.AddListener(StopStickman);
-        StopTimerButton.OnGoStickman.AddListener(ChangeAnimation);
-        StopTimerButton.OnStopStickman.AddListener(ChangeAnimation);
-
-        
-        if (StopTimerButton.isStop)
+        switch (_stickmanColorType)
         {
-            StopStickman();
-            ChangeAnimation();
+            case StickmanColor.Red:
+                _renderer.material = _red;
+                break;
+            case StickmanColor.Green:
+                _renderer.material = _green;
+                break;
+            case StickmanColor.Yellow:
+                _renderer.material = _yellow;
+                break;
         }
 
+        
+        FrontStickmanLine.OnStickmanTouchLine.AddListener(StopStickman);
+        StickmanController.OnMoveStickmans.AddListener(MoveStickman);
+        StickmanController._stickmanController.IncrementStickmanCount();
+        
+        StickmanController.OnKillstickman.AddListener(CheckAround);
+        OnResetMainLine.AddListener(ResetMainLine);
+        
     }
+    
+
+
+    private void OnDestroy()
+    {
+        OnResetMainLine.Invoke();
+        
+        StickmanController._stickmanController.DectrementStickmanCount();
+        StickmanController.OnMoveStickmans.RemoveListener(MoveStickman);
+        if (IsFirstLine)
+        {
+            StickmanController._stickmanController.FirstLineCount--;
+            if(StickmanController._stickmanController.FirstLineCount == 0)
+            {
+                StickmanController._stickmanController.MoveAllStickmans();
+            }
+        }
+       
+    }
+
+    private void OnValidate()
+    {
+        _renderer = GetComponentInChildren<Renderer>();
+        switch (_stickmanColorType)
+        {
+            case StickmanColor.Red:
+                _renderer.material = _red;
+                break;
+            case StickmanColor.Green:
+                _renderer.material = _green;
+                break;
+            case StickmanColor.Yellow:
+                _renderer.material = _yellow;
+                break;
+        }
+    }
+
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = new Color(1, 0, 0);
+    //    Vector3 posOffset = new Vector3(0, _yParticleOffset, 0);
+    //    Gizmos.DrawSphere(transform.position + posOffset, _sphereRadius);
+    //}
+
     public void DestroyStickman()
     {
         IsActive = false;
         Vector3 posOffset = new Vector3(0, _yParticleOffset, 0);
-        Ray rayRight = new Ray(transform.localPosition + posOffset, transform.right);
-        Ray rayLeft = new Ray(transform.localPosition + posOffset, -transform.right);
-        Ray rayFront = new Ray(transform.localPosition + posOffset, transform.forward);
-        Ray rayBack = new Ray(transform.localPosition + posOffset, -transform.forward);
-
-
-        for (int i = 0; i < 4; i++)
+        
+        Collider [] colliders = Physics.OverlapSphere(transform.position + posOffset, _sphereRadius);
+        foreach(Collider c in colliders)
         {
-            Ray _currentRay = new Ray();
-            switch (i)
+            Stickman s = c.gameObject.GetComponent<Stickman>();
+            if(s != null && s.IsActive && s._stickmanColorType == _stickmanColorType)
             {
-                case 0:
-                    _currentRay = rayRight;
-                    break;
-                case 1:
-                    _currentRay = rayLeft;
-                    break;
-                case 2:
-                    _currentRay = rayFront;
-                    break;
-                case 3:
-                    _currentRay = rayBack;
-                    break;
-            }
-            if (Physics.Raycast(_currentRay, out RaycastHit hit, _maxRayDistance))
-            {
-                
-                if (hit.transform.GetComponentInParent<Stickman>())
-                {
-                    if (hit.transform.GetComponentInParent<Stickman>().Color == Color && hit.transform.GetComponentInParent<Stickman>().IsActive)
-                    {
-                        hit.transform.GetComponentInParent<Stickman>().DestroyStickman();
-                    }
-
-                }
-            }
+                s.DestroyStickman();
+            } 
         }
+
         EnableParticle();
-        OnDestroyStickman();
+        StickmanController._stickmanController.KillStickman();
         Destroy(gameObject);
         
     }
 
-    public void OnDestroyStickman()
+    private void CheckAround()
     {
-        
-        StickmanController._stickmanController.IncrementStickmanCount();
+        IsMainLine = _isMainLine;
+        if (!_isMainLine)
+        {
+            Vector3 posOffset = new Vector3(0, _yParticleOffset, 0);
 
+            Collider[] colliders = Physics.OverlapSphere(transform.position + posOffset, _sphereRadius);
+            foreach (Collider c in colliders)
+            {
+                Stickman s = c.gameObject.GetComponent<Stickman>();
+                if (s != null && s.IsMainLine && s.IsActive)
+                {
+                    IsMainLine = true;
+                    GetMainLineAround();
+                }
+            }
+
+        }
+        if (!IsMainLine)
+        {
+            if (IsActive && gameObject != null)
+            {
+                StartCoroutine(DethTimer());
+            }
+        }
+    }
+
+    public  void GetMainLineAround()
+    {
+        Vector3 posOffset = new Vector3(0, _yParticleOffset, 0);
+
+        Collider[] colliders = Physics.OverlapSphere(transform.position + posOffset, _sphereRadius);
+        foreach (Collider c in colliders)
+        {
+            Stickman s = c.gameObject.GetComponent<Stickman>();
+            if (s != null && !s.IsMainLine && s.IsActive)
+            {
+                s.IsMainLine = true;
+                s.GetMainLineAround();
+            }
+        }
+    }
+
+   
+
+    public StickmanColor GetColorType()
+    {
+        return _stickmanColorType;
+    }
+
+    public List<Transform> GetTransformsList()
+    {
+        return _aroundTransforms;
+    }
+
+    public void SetMaterial(Material material, StickmanColor colorType)
+    {
+        _renderer.material = material;
+        _stickmanColorType = colorType;
     }
 
     public void MoveStickman()
     {
+        ChangeAnimation(true);
+        //StopStickman();
+        _moving = StartCoroutine(Moving());
         
-         _moving = StartCoroutine(Moving());
     }
 
     public void StopStickman()
     {
         if (_moving != null)
         {
+            ChangeAnimation(false);
             StopCoroutine(_moving);
         }
     }
@@ -111,8 +204,9 @@ public class Stickman : MonoBehaviour
     private IEnumerator Moving()
     {
         float speed = MainController._mainController.StickmanSpeed;
-        while (MainController._mainController.IsGamePlayed)
+        while (true)
         {
+            
             transform.Translate(transform.forward * speed * Time.deltaTime);
 
             yield return new WaitForEndOfFrame();
@@ -122,27 +216,29 @@ public class Stickman : MonoBehaviour
     public void EnableParticle()
     {
         Vector3 posOffset = new Vector3(0, _yParticleOffset, 0);
-        Instantiate(_particle, transform.localPosition + posOffset, Quaternion.identity);
+        Instantiate(_particle, transform.position + posOffset, Quaternion.identity);
     }
 
-    public void SetColor(Material color)
+    private IEnumerator DethTimer()
     {
-       _renderer.material = color;
-    } 
-
-    public void ChangeAnimation()
-    {
-        _stickmanAnimator.SetBool("IsWalk", !_stickmanAnimator.GetBool("IsWalk"));
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Finish"))
+        yield return new WaitForFixedUpdate();
+        if (!IsMainLine)
         {
+            yield return new WaitForSeconds(1f);
             EnableParticle();
-            StickmanController._stickmanController.DectrementStickmanCount();
+            OnResetMainLine.Invoke();
             Destroy(gameObject);
         }
+    }
+
+    public void ResetMainLine()
+    {
+        IsMainLine = _isMainLine;
+    }
+
+    public void ChangeAnimation(bool isGo)
+    {
+        _stickmanAnimator.SetBool("IsWalk", isGo);
     }
 
 

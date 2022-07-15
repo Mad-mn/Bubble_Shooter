@@ -3,12 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - FxTemporaire
+  - TouchChecker
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - TouchChecker
   - Water
   - UI
   - 

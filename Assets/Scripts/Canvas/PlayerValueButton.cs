@@ -42,7 +42,7 @@ public class PlayerValueButton : MonoBehaviour
             _playerInfo.Coins -= _price;
             _playerInfo.UpdateValueLvl(_value);
             SetValue();
-            CanvasController._canvasController.ChangeCointTxt();
+           // CanvasController._canvasController.ChangeCointTxt();
         }
 
         CanvasController._canvasController.PlaySound();

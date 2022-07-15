@@ -53,7 +53,7 @@ public class CannonController : MonoBehaviour
     {
         if (!MainController._mainController.IsGamePlayed)
         {
-            Debug.Log(0);
+            
             CastRayForSight();
         }
     }
@@ -61,6 +61,7 @@ public class CannonController : MonoBehaviour
     public void RotateCannon()
     {
         _rotatingCannon = StartCoroutine(Rotation());
+        EnableOrDisableAniamtion();
         _lineRenderer.enabled = true;
     }
     public void StopRotate()
@@ -76,13 +77,17 @@ public class CannonController : MonoBehaviour
         while (true)
         {
 #if UNITY_EDITOR
-            _tapPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition + Camera.main.transform.position);
-            
+             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
 #elif UNITY_ANDROID
-             _tapPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.GetTouch(0).position.x, Input.GetTouch(0).position.y, 0) + Camera.main.transform.position);
+             Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
 #endif
-            _tapPosition = new Vector3(_tapPosition.x, _cannonTransform.position.y, _tapPosition.z);
-            _cannonTransform.LookAt(_tapPosition, Vector3.up);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                Vector3 target = new Vector3(hit.point.x, _cannonTransform.position.y, hit.point.z);
+                _cannonTransform.LookAt(target, Vector3.up);
+            }
+            
 
             CastRayForSight();
 
@@ -92,8 +97,7 @@ public class CannonController : MonoBehaviour
 
     private void Shot()
     {
-        if (_reloadCanvas.IsReady)
-        {
+        
 
             GameObject bullet = Instantiate(_bulletPrefab, _bulletSpawnPosition.position, Quaternion.identity);
 
@@ -103,12 +107,12 @@ public class CannonController : MonoBehaviour
             bullet.GetComponent<Bullet>().Color = _nextBulletColorType;
             SetNextBulletColor();
 
-            _reloadCanvas.Reload();
+            //_reloadCanvas.Reload();
             if (!AudioController._audioController.IsOff)
             {
                 _audio.Play();
             }
-        }
+        
     }
 
     public void SetNextBulletColor()
@@ -132,7 +136,7 @@ public class CannonController : MonoBehaviour
         {
             int hitPointSide = (hit.point.x - transform.position.x) > 0 ? -1 : 1;
 
-            ChangeLineRenderer(hit.point + _bulletPrefab.transform.localScale / 2 * hitPointSide, 1);
+            ChangeLineRenderer(hit.point + _bulletPrefab.transform.localScale / 4 * hitPointSide, 1);
 
             if (!hit.transform.CompareTag("Player"))
             {

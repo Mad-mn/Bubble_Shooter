@@ -5,6 +5,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField] private GameObject _particle;
+    [SerializeField] float _sphereRadius;
 
     private float _bulletSpeed;
     private Coroutine _moving;
@@ -57,15 +58,32 @@ public class Bullet : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             StopCoroutine(_moving);
-            if(other.GetComponent<Stickman>().Color == Color)
-            {
-                other.GetComponent<Stickman>().DestroyStickman();
 
-            }
-            else
+            bool isEqual = false;
+
+            Collider[] colliders = Physics.OverlapSphere(transform.position, _sphereRadius);
+            foreach(Collider c in colliders)
             {
-                StickmanController._stickmanController.CreateNewStickman(other.transform.position, other.transform.forward, _renderer.material, Color);
+                Stickman s = c.GetComponent<Stickman>();
+                if(s != null)
+                {
+                    isEqual = s.GetColorType() == Color ? true : false ;
+                    if (isEqual)
+                    {
+                        s.DestroyStickman();
+                        break;
+                    }
+                }
+
+                
+                
             }
+            if (!isEqual)
+            {
+                StickmanController._stickmanController.CreateNewStickman(transform.position, Color, other.GetComponent<Stickman>().GetTransformsList());
+            }
+           
+
             Instantiate(_particle, transform.localPosition, Quaternion.identity);
             Destroy(gameObject);
         }
